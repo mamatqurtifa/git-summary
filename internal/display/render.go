@@ -145,9 +145,12 @@ func printTopFiles(s stats.Summary) {
 		if maxChanges > 0 {
 			barLen = int(float64(f.Changes) / float64(maxChanges) * float64(barWidth))
 		}
+		if barLen < 0 { barLen = 0 }
+		if barLen > barWidth { barLen = barWidth }
 		bar := strings.Repeat("▪", barLen) + strings.Repeat("·", barWidth-barLen)
 		name := truncate(f.Path, 36)
-		namePad := 36 - len(name)
+		namePad := 36 - len([]rune(name))
+		if namePad < 0 { namePad = 0 }
 
 		fmt.Printf("  %s%s %s %s\n",
 			color(white, name),
