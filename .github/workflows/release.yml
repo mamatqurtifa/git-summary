@@ -68,7 +68,7 @@ jobs:
           CGO_ENABLED: 0
         run: |
           go build \
-            -ldflags="-s -w -X github.com/yourusername/git-summary/cmd.version=${{ github.ref_name }}" \
+            -ldflags="-s -w -X github.com/mamatqurtifa/git-summary/cmd.version=${{ github.ref_name }}" \
             -o ${{ matrix.asset_name }} \
             .
 

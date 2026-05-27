@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/yourusername/git-summary/internal/gitlog"
+	"github.com/mamatqurtifa/git-summary/internal/gitlog"
 )
 
 // WeeklySlice is one author's commit count for a single week.

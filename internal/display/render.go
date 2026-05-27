@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/yourusername/git-summary/internal/stats"
+	"github.com/mamatqurtifa/git-summary/internal/stats"
 )
 
 // Options controls rendering behavior.

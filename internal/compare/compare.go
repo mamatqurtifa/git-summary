@@ -7,8 +7,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/yourusername/git-summary/internal/gitlog"
-	"github.com/yourusername/git-summary/internal/stats"
+	"github.com/mamatqurtifa/git-summary/internal/gitlog"
+	"github.com/mamatqurtifa/git-summary/internal/stats"
 )
 
 // BranchSummary is a stats.Summary tagged with a branch name.

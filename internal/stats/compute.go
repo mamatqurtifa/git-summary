@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yourusername/git-summary/internal/gitlog"
+	"github.com/mamatqurtifa/git-summary/internal/gitlog"
 )
 
 // Contributor holds per-author activity.

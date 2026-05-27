@@ -51,13 +51,13 @@ Flag `-format json|csv|md` exports any summary to a file or stdout — useful in
 
 ```bash
 # amd64 (most servers and desktops)
-curl -sSL https://github.com/yourusername/git-summary/releases/latest/download/git-summary-linux-amd64 \
+curl -sSL https://github.com/mamatqurtifa/git-summary/releases/latest/download/git-summary-linux-amd64 \
   -o git-summary
 chmod +x git-summary
 sudo mv git-summary /usr/local/bin/
 
 # arm64 (Raspberry Pi, AWS Graviton, etc.)
-curl -sSL https://github.com/yourusername/git-summary/releases/latest/download/git-summary-linux-arm64 \
+curl -sSL https://github.com/mamatqurtifa/git-summary/releases/latest/download/git-summary-linux-arm64 \
   -o git-summary
 chmod +x git-summary
 sudo mv git-summary /usr/local/bin/
@@ -67,13 +67,13 @@ sudo mv git-summary /usr/local/bin/
 
 ```bash
 # Apple Silicon — M1, M2, M3 (arm64)
-curl -sSL https://github.com/yourusername/git-summary/releases/latest/download/git-summary-darwin-arm64 \
+curl -sSL https://github.com/mamatqurtifa/git-summary/releases/latest/download/git-summary-darwin-arm64 \
   -o git-summary
 chmod +x git-summary
 sudo mv git-summary /usr/local/bin/
 
 # Intel Mac (amd64)
-curl -sSL https://github.com/yourusername/git-summary/releases/latest/download/git-summary-darwin-amd64 \
+curl -sSL https://github.com/mamatqurtifa/git-summary/releases/latest/download/git-summary-darwin-amd64 \
   -o git-summary
 chmod +x git-summary
 sudo mv git-summary /usr/local/bin/
@@ -84,7 +84,7 @@ sudo mv git-summary /usr/local/bin/
 
 ### Windows
 
-1. Go to the [Releases](https://github.com/yourusername/git-summary/releases/latest) page
+1. Go to the [Releases](https://github.com/mamatqurtifa/git-summary/releases/latest) page
 2. Download `git-summary-windows-amd64.exe`
 3. Rename it to `git-summary.exe`
 4. Move it to a folder that's in your `PATH`, for example `C:\Users\<you>\bin\`
@@ -93,7 +93,7 @@ Or with PowerShell:
 
 ```powershell
 Invoke-WebRequest `
-  -Uri "https://github.com/yourusername/git-summary/releases/latest/download/git-summary-windows-amd64.exe" `
+  -Uri "https://github.com/mamatqurtifa/git-summary/releases/latest/download/git-summary-windows-amd64.exe" `
   -OutFile "$env:USERPROFILE\bin\git-summary.exe"
 ```
 
@@ -102,13 +102,13 @@ Invoke-WebRequest `
 ### Install with Go (all platforms)
 
 ```bash
-go install github.com/yourusername/git-summary@latest
+go install github.com/mamatqurtifa/git-summary@latest
 ```
 
 ### Build from source
 
 ```bash
-git clone https://github.com/yourusername/git-summary.git
+git clone https://github.com/mamatqurtifa/git-summary.git
 cd git-summary
 ./install.sh        # Linux / macOS — builds + installs + sets up shell completion
 ```

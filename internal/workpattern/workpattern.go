@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yourusername/git-summary/internal/gitlog"
+	"github.com/mamatqurtifa/git-summary/internal/gitlog"
 )
 
 // WorkHours defines the "normal" working window (24-hour).
