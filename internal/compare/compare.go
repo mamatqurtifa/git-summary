@@ -97,6 +97,7 @@ func sharedFiles(a, b stats.Summary) []string {
 }
 
 // Renderer
+
 const (
 	reset  = "\033[0m"
 	bold   = "\033[1m"

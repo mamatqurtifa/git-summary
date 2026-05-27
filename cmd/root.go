@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/mamatqurtifa/git-summary/internal/compare"
 	"github.com/mamatqurtifa/git-summary/internal/dirmap"
@@ -149,21 +150,43 @@ func Execute() {
 // Subcommand: compare
 
 func runCompare() {
+	// Separate branch names (non-flag args) from flags.
+	// Supports any order: compare main dev --since "1 month ago"
+	// or: compare --since "1 month ago" main dev
+	var branches []string
+	var flagArgs []string
+	args := os.Args[2:]
+	for i := 0; i < len(args); i++ {
+		a := args[i]
+		if strings.HasPrefix(a, "-") {
+			flagArgs = append(flagArgs, a)
+			// if next arg is the flag value (not another flag), include it
+			if i+1 < len(args) && !strings.HasPrefix(args[i+1], "-") &&
+				(a == "-since" || a == "--since" || a == "-top" || a == "--top") {
+				i++
+				flagArgs = append(flagArgs, args[i])
+			}
+		} else {
+			branches = append(branches, a)
+		}
+	}
+
+	if len(branches) < 2 {
+		fmt.Fprintln(os.Stderr, "Usage: git-summary compare <branchA> <branchB> [repo-path]")
+		fmt.Fprintln(os.Stderr, "Example: git-summary compare main develop --since \"1 month ago\"")
+		os.Exit(1)
+	}
+
 	fs := flag.NewFlagSet("git-summary compare", flag.ExitOnError)
 	since   := fs.String("since", "1 month ago", "Time range")
 	topN    := fs.Int("top", 10, "Top N contributors")
 	noColor := fs.Bool("no-color", false, "Disable color")
-	_ = fs.Parse(os.Args[2:])
+	_ = fs.Parse(flagArgs)
 
-	args := fs.Args()
-	if len(args) < 2 {
-		fmt.Fprintln(os.Stderr, "Usage: git-summary compare <branchA> <branchB> [repo-path]")
-		os.Exit(1)
-	}
-	branchA, branchB := args[0], args[1]
+	branchA, branchB := branches[0], branches[1]
 	repoPath := "."
-	if len(args) >= 3 {
-		repoPath = args[2]
+	if len(branches) >= 3 {
+		repoPath = branches[2]
 	}
 
 	res, err := compare.Run(repoPath, branchA, branchB, *since, *topN)
