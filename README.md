@@ -47,32 +47,71 @@ Flag `-format json|csv|md` exports any summary to a file or stdout — useful in
 
 ## Installation
 
-### Pre-built binary (recommended)
-
-Download from the [Releases](https://github.com/yourusername/git-summary/releases) page.
+### Linux
 
 ```bash
-# macOS / Linux
-curl -sSL https://github.com/yourusername/git-summary/releases/latest/download/git-summary-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m) -o git-summary
+# amd64 (most servers and desktops)
+curl -sSL https://github.com/yourusername/git-summary/releases/latest/download/git-summary-linux-amd64 \
+  -o git-summary
+chmod +x git-summary
+sudo mv git-summary /usr/local/bin/
+
+# arm64 (Raspberry Pi, AWS Graviton, etc.)
+curl -sSL https://github.com/yourusername/git-summary/releases/latest/download/git-summary-linux-arm64 \
+  -o git-summary
 chmod +x git-summary
 sudo mv git-summary /usr/local/bin/
 ```
 
-### Install with Go
+### macOS
+
+```bash
+# Apple Silicon — M1, M2, M3 (arm64)
+curl -sSL https://github.com/yourusername/git-summary/releases/latest/download/git-summary-darwin-arm64 \
+  -o git-summary
+chmod +x git-summary
+sudo mv git-summary /usr/local/bin/
+
+# Intel Mac (amd64)
+curl -sSL https://github.com/yourusername/git-summary/releases/latest/download/git-summary-darwin-amd64 \
+  -o git-summary
+chmod +x git-summary
+sudo mv git-summary /usr/local/bin/
+```
+
+> **macOS note:** if you see _"cannot be opened because the developer cannot be verified"_, run:
+> `xattr -d com.apple.quarantine /usr/local/bin/git-summary`
+
+### Windows
+
+1. Go to the [Releases](https://github.com/yourusername/git-summary/releases/latest) page
+2. Download `git-summary-windows-amd64.exe`
+3. Rename it to `git-summary.exe`
+4. Move it to a folder that's in your `PATH`, for example `C:\Users\<you>\bin\`
+
+Or with PowerShell:
+
+```powershell
+Invoke-WebRequest `
+  -Uri "https://github.com/yourusername/git-summary/releases/latest/download/git-summary-windows-amd64.exe" `
+  -OutFile "$env:USERPROFILE\bin\git-summary.exe"
+```
+
+> Make sure `$env:USERPROFILE\bin` is in your `PATH`. Search "environment variables" in the Start menu to add it.
+
+### Install with Go (all platforms)
 
 ```bash
 go install github.com/yourusername/git-summary@latest
 ```
 
-### Build from source + auto-install completion
+### Build from source
 
 ```bash
 git clone https://github.com/yourusername/git-summary.git
 cd git-summary
-./install.sh
+./install.sh        # Linux / macOS — builds + installs + sets up shell completion
 ```
-
-`install.sh` builds the binary, installs it to `/usr/local/bin`, and sets up shell completion for your current shell automatically.
 
 **Requirements:** Go 1.21+, Git 2.x
 
