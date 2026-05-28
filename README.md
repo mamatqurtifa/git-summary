@@ -37,7 +37,7 @@
 |---------|-------------|
 | `compare <A> <B>` | Side-by-side branch comparison |
 | `changelog` | Auto-categorised changelog between two tags/refs |
-| `completion <shell>` | Shell completion (bash/zsh/fish) |
+| `completion <shell>` | Shell tab completion (bash/zsh/fish) |
 | `version` | Print version |
 
 ### Export
@@ -47,21 +47,59 @@ Flag `-format json|csv|md` exports any summary to a file or stdout — useful in
 
 ## Installation
 
-### Linux
+### Windows
 
-```bash
-# amd64 (most servers and desktops)
-curl -sSL https://github.com/mamatqurtifa/git-summary/releases/latest/download/git-summary-linux-amd64 \
-  -o git-summary
-chmod +x git-summary
-sudo mv git-summary /usr/local/bin/
+**Step 1 — Download**
 
-# arm64 (Raspberry Pi, AWS Graviton, etc.)
-curl -sSL https://github.com/mamatqurtifa/git-summary/releases/latest/download/git-summary-linux-arm64 \
-  -o git-summary
-chmod +x git-summary
-sudo mv git-summary /usr/local/bin/
+Go to the [Releases](https://github.com/mamatqurtifa/git-summary/releases/latest) page and download the correct file for your machine:
+
+| Your machine | File to download |
+|---|---|
+| Most laptops & desktops (64-bit Intel/AMD) | `git-summary-windows-amd64.exe` |
+| ARM-based Windows (Surface Pro X, etc.) | `git-summary-windows-arm64.exe` |
+
+Not sure which one? Open PowerShell and run:
+```powershell
+echo $env:PROCESSOR_ARCHITECTURE
+# AMD64 → download amd64
+# ARM64 → download arm64
 ```
+
+**Step 2 — Rename**
+
+Rename the downloaded file to `git-summary.exe` (remove the `-windows-amd64` part).
+
+**Step 3 — Move to a folder in your PATH**
+
+Create a dedicated folder for CLI tools and move the file there:
+
+```powershell
+# Create the folder (skip if it already exists)
+mkdir "$env:USERPROFILE\bin"
+
+# Move the renamed file
+Move-Item "$env:USERPROFILE\Downloads\git-summary.exe" "$env:USERPROFILE\bin\git-summary.exe"
+```
+
+**Step 4 — Add the folder to PATH**
+
+1. Open **Start Menu**, search for **"Edit the system environment variables"**, and open it
+2. Click **"Environment Variables..."**
+3. Under **"User variables"**, select **Path** and click **"Edit"**
+4. Click **"New"** and paste: `C:\Users\<your-username>\bin`
+5. Click **OK** on all dialogs
+
+**Step 5 — Verify**
+
+Open a **new** PowerShell window (important — existing windows won't have the new PATH) and run:
+
+```powershell
+git-summary --help
+```
+
+> **SmartScreen warning:** The first time you run the file, Windows may show _"Windows protected your PC"_. Click **"More info"** → **"Run anyway"**. This is normal for open-source binaries without a paid code-signing certificate.
+
+---
 
 ### macOS
 
@@ -79,25 +117,30 @@ chmod +x git-summary
 sudo mv git-summary /usr/local/bin/
 ```
 
-> **macOS note:** if you see _"cannot be opened because the developer cannot be verified"_, run:
-> `xattr -d com.apple.quarantine /usr/local/bin/git-summary`
+> **Gatekeeper warning:** If you see _"cannot be opened because the developer cannot be verified"_, run:
+> ```bash
+> xattr -d com.apple.quarantine /usr/local/bin/git-summary
+> ```
 
-### Windows
+---
 
-1. Go to the [Releases](https://github.com/mamatqurtifa/git-summary/releases/latest) page
-2. Download `git-summary-windows-amd64.exe`
-3. Rename it to `git-summary.exe`
-4. Move it to a folder that's in your `PATH`, for example `C:\Users\<you>\bin\`
+### Linux
 
-Or with PowerShell:
+```bash
+# amd64 (most servers and desktops)
+curl -sSL https://github.com/mamatqurtifa/git-summary/releases/latest/download/git-summary-linux-amd64 \
+  -o git-summary
+chmod +x git-summary
+sudo mv git-summary /usr/local/bin/
 
-```powershell
-Invoke-WebRequest `
-  -Uri "https://github.com/mamatqurtifa/git-summary/releases/latest/download/git-summary-windows-amd64.exe" `
-  -OutFile "$env:USERPROFILE\bin\git-summary.exe"
+# arm64 (Raspberry Pi, AWS Graviton, etc.)
+curl -sSL https://github.com/mamatqurtifa/git-summary/releases/latest/download/git-summary-linux-arm64 \
+  -o git-summary
+chmod +x git-summary
+sudo mv git-summary /usr/local/bin/
 ```
 
-> Make sure `$env:USERPROFILE\bin` is in your `PATH`. Search "environment variables" in the Start menu to add it.
+---
 
 ### Install with Go (all platforms)
 
@@ -117,75 +160,285 @@ cd git-summary
 
 ---
 
-## Usage
+## Command reference
+
+### `git-summary` — main summary
+
+Run inside any git repository. Without `-since`, an interactive time-range picker appears.
+
+```
+git-summary [options] [path]
+```
+
+**Options:**
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `-since` | interactive picker | Start date. Accepts natural language or ISO date |
+| `-until` | now | End date |
+| `-author` | all authors | Filter by author name or email (partial match) |
+| `-branch` | current branch | Branch to analyse |
+| `-top` | 10 | Number of top contributors to show |
+| `-no-color` | false | Disable ANSI colors (useful for piping) |
+| `-trends` | false | Show contributor trends & bus factor section |
+| `-dirs` | false | Show directory ownership breakdown section |
+| `-workpattern` | false | Show work pattern analysis section |
+| `-all` | false | Show all extra sections at once |
+| `-work-start` | 9 | Work day start hour (for workpattern analysis) |
+| `-work-end` | 18 | Work day end hour (for workpattern analysis) |
+| `-format` | — | Export format: `json`, `csv`, or `md` |
+| `-output` | stdout | Write export output to a file |
+
+**Examples:**
 
 ```bash
-# Run inside any git repo (shows interactive time-range picker)
+# Interactive picker (no arguments)
 git-summary
 
-# With flags
-git-summary --since "1 week ago"
-git-summary --since "1 month ago" --all
-git-summary --author alice --top 5
-git-summary --branch main --no-color
+# Last week, all sections
+git-summary --since "1 week ago" --all
+
+# Last month, filter by author
+git-summary --since "1 month ago" --author "alice"
+
+# Specific date range
+git-summary --since 2025-01-01 --until 2025-06-30
+
+# Analyse a specific branch, show top 5 only
+git-summary --branch main --top 5
+
+# Analyse a different repo
+git-summary /path/to/other/repo
+
+# No color output (for scripts or piping)
+git-summary --since "1 month ago" --no-color
+
+# Adjust work hours for workpattern analysis
+git-summary --workpattern --work-start 8 --work-end 17
 ```
 
-### All flags
+**Accepted `-since` / `-until` values:**
 
 ```
-Main options:
-  -since string      Start date (default: interactive picker)
-                     e.g. "1 week ago", "1 month ago", "2024-01-01"
-  -until string      End date (default: now)
-  -author string     Filter by author (partial name or email)
-  -branch string     Branch to analyze (default: current)
-  -top int           Top N contributors (default: 10)
-  -no-color          Disable colored output
-
-Extra sections:
-  -trends            Contributor trends & bus factor
-  -dirs              Directory ownership breakdown
-  -workpattern       Work pattern analysis
-  -all               Show all extra sections
-  -work-start int    Work day start hour (default: 9)
-  -work-end int      Work day end hour   (default: 18)
-
-Export:
-  -format string     json | csv | md
-  -output string     Write to file (default: stdout)
+"24 hours ago"      "1 week ago"       "2 weeks ago"
+"1 month ago"       "3 months ago"     "6 months ago"
+"1 year ago"        2025-01-01         yesterday
+today               (empty = all time)
 ```
 
 ---
 
-## Subcommands
+### `git-summary compare` — branch comparison
 
-### `compare` — branch comparison
+Shows a side-by-side diff of two branches: commits, active days, lines changed, top contributors, who is unique to each branch, and files changed in both branches.
+
+```
+git-summary compare <branchA> <branchB> [options]
+```
+
+**Options:**
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `-since` | 1 month ago | Time range to compare |
+| `-top` | 10 | Top N contributors per branch |
+| `-no-color` | false | Disable colors |
+
+**Examples:**
 
 ```bash
+# Compare main vs develop (last month)
 git-summary compare main develop
-git-summary compare main develop --since "2 weeks ago"
+
+# Compare with custom time range — flags can go anywhere
+git-summary compare main develop --since "3 months ago"
+git-summary compare --since "1 week ago" main develop
+
+# Compare in a different repo
 git-summary compare main develop /path/to/repo
 ```
 
-Shows side-by-side: commits, active days, lines changed, top contributors per branch, contributors unique to each branch, and files changed in both (potential merge conflicts).
+**Sample output:**
 
-### `changelog` — release diff
+```
+  Branch Comparison
+  ─────────────────────────────────────────────────────────────
+  main                           │ develop
+  ─────────────────────────────────────────────────────────────
+  Commits               45       │ 62
+  Active days           18       │ 24
+  Lines added          +2301     │ +4120
+  Lines deleted        -820      │ -1540
+  Contributors            3      │ 4
+
+  Top contributors
+  Alice Chen    32    │ Alice Chen    41
+  Bob Smith     13    │ Bob Smith     15
+                      │ carol99        6
+
+  contributors only in develop: carol99
+
+  Files changed in both branches
+  ⚠ src/api/routes.ts
+  ⚠ package.json
+```
+
+---
+
+### `git-summary changelog` — release diff
+
+Generates a categorised changelog between two git tags or refs. Commits are grouped by conventional commit prefix (`feat`, `fix`, `docs`, `chore`, `refactor`, `perf`, `test`).
+
+```
+git-summary changelog [options] [path]
+```
+
+**Options:**
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `-from` | auto (second-latest tag) | Start tag or ref |
+| `-to` | HEAD | End tag or ref |
+| `-md` | false | Output as Markdown instead of terminal format |
+| `-output` | stdout | Write to file |
+| `-list-tags` | false | List all available tags and exit |
+| `-no-color` | false | Disable colors |
+
+**Examples:**
 
 ```bash
 # Auto-detect last two tags
 git-summary changelog
 
-# Specific range
+# Between specific tags
 git-summary changelog --from v1.0.0 --to v1.1.0
 
-# Markdown output (great for CHANGELOG.md)
-git-summary changelog --from v1.0.0 --md --output CHANGELOG.md
+# From a tag to current HEAD
+git-summary changelog --from v1.0.0
 
-# List available tags
+# Save as Markdown (great for CHANGELOG.md or GitHub release notes)
+git-summary changelog --from v1.0.0 --to v1.1.0 --md --output CHANGELOG.md
+
+# See what tags are available
 git-summary changelog --list-tags
 ```
 
-Commits are auto-categorised by conventional commit prefix (`feat`, `fix`, `docs`, `chore`, etc.). Unknown prefixes go into "Other changes".
+**Sample output:**
+
+```
+  Changelog: v1.0.0 → v1.1.0
+  ──────────────────────────────────────────────────
+  8 total commits
+
+  ✨ New features (2)
+  a1b2c3d  feat: add --dirs flag for directory breakdown  — Alice
+  d4e5f6a  feat: export to CSV format  — Bob
+
+  🐛 Bug fixes (3)
+  b2c3d4e  fix: prevent panic on long file paths  — Alice
+  c3d4e5f  fix: workpattern percentages rounding  — Bob
+  e5f6a7b  fix: compare branch flag parsing  — Alice
+
+  📝 Documentation (1)
+  f6a7b8c  docs: update Windows installation guide  — Alice
+
+  🔧 Chores (2)
+  7b8c9d0  chore: update go.mod module path  — Bob
+  8c9d0e1  chore: add CI workflow  — Alice
+```
+
+---
+
+### Export (`-format`)
+
+Export the summary data to JSON, CSV, or Markdown. Can be combined with any filter flag.
+
+```bash
+git-summary [filter options] -format <json|csv|md> [-output <file>]
+```
+
+**Examples:**
+
+```bash
+# Print JSON to terminal
+git-summary --since "1 month ago" --format json
+
+# Save JSON to file (for CI, dashboards, or further processing)
+git-summary --since "1 month ago" --format json --output report.json
+
+# Save Markdown report (ready to share with team or stakeholders)
+git-summary --since "1 month ago" --format md --output REPORT.md
+
+# Save CSV (open in Excel or Google Sheets)
+git-summary --format csv --output data.csv
+
+# Pipe JSON into jq for custom queries
+git-summary --format json | jq '.contributors[0]'
+git-summary --format json | jq '.total_commits'
+git-summary --format json | jq '[.contributors[] | {name, commits}]'
+```
+
+**JSON structure:**
+
+```json
+{
+  "generated_at": "2025-05-27T10:00:00Z",
+  "date_range": "Apr 27, 2025 → May 27, 2025",
+  "total_commits": 142,
+  "total_added": 8423,
+  "total_deleted": 3201,
+  "active_days": 89,
+  "avg_commits_per_day": 1.6,
+  "most_active_hour": 10,
+  "most_active_day": "Tuesday",
+  "contributors": [
+    { "name": "Alice", "email": "alice@example.com", "commits": 87, "added": 5420, "deleted": 1823 }
+  ],
+  "top_files": [
+    { "path": "internal/parser.go", "changes": 38 }
+  ],
+  "weekly_activity": [
+    { "week": "2025-W17", "commits": 12 }
+  ],
+  "hourly_activity": [0, 0, 0, 0, 0, 1, 3, 8, 12, 18, 21, ...]
+}
+```
+
+---
+
+### Shell completion
+
+After setup, `git-summary [TAB][TAB]` completes flags, subcommands, branch names, tag names, and date values automatically.
+
+```bash
+# bash — add to ~/.bashrc
+source <(git-summary completion bash)
+
+# zsh — add to ~/.zshrc
+source <(git-summary completion zsh)
+
+# fish — one-time install, auto-loads on next session
+git-summary completion fish > ~/.config/fish/completions/git-summary.fish
+```
+
+**What gets completed:**
+
+```
+git-summary [TAB]
+→ compare  changelog  completion  version  -since  -until  -author ...
+
+git-summary -since [TAB]
+→ today  yesterday  "1 week ago"  "2 weeks ago"  "1 month ago" ...
+
+git-summary -branch [TAB]
+→ main  develop  feature/xyz   (pulled live from git branch)
+
+git-summary changelog --from [TAB]
+→ v1.0.0  v1.0.1  v1.1.0       (pulled live from git tag)
+
+git-summary -format [TAB]
+→ json  csv  md
+```
 
 ---
 
@@ -200,13 +453,25 @@ Commits are auto-categorised by conventional commit prefix (`feat`, `fix`, `docs
   ────────────────────────────────────────────────────────────
   Alice Chen                87  61.3%   ↑ rising    ▁▂▃▄▆▇█▇
   Bob Smith                 41  28.9%   → stable    ▃▃▄▃▄▃▄▃
-  carol99                   14   9.9%   ✗ gone      ▄▃▁▁··· ·
+  carol99                   14   9.9%   ✗ gone      ▄▃▁▁·····
 
   ⚑ bus factor: 2 people own 80% of commits ← at risk
       → Alice Chen, Bob Smith
 ```
 
-**Bus factor** is the minimum number of people who hold 80% of commit history. A bus factor of 1 is a critical single point of failure.
+**Trend labels:**
+
+| Label | Meaning |
+|-------|---------|
+| `↑ rising` | Activity increased significantly in recent weeks |
+| `↓ falling` | Activity decreased significantly in recent weeks |
+| `→ stable` | Consistent commit frequency |
+| `★ new` | No prior activity, recently started committing |
+| `✗ gone` | Was active before, no recent commits |
+
+**Bus factor** is the minimum number of contributors who collectively hold 80% of the commit history. A bus factor of 1 means the project depends critically on a single person.
+
+---
 
 ### `-dirs` — Directory ownership
 
@@ -219,9 +484,13 @@ Commits are auto-categorised by conventional commit prefix (`feat`, `fix`, `docs
     ├  Alice                                           94%
     ├  Bob                                              6%
   cmd                               28  Bob            71%  ████████████░░░░░░
+    ├  Bob                                             71%
+    ├  Alice                                           29%
 ```
 
-Directories highlighted in yellow have a sole owner (≥90%) — a potential bus factor risk at the folder level.
+Directories with a sole owner (≥90%) are highlighted in yellow — indicating a knowledge silo and potential bus factor risk at the folder level.
+
+---
 
 ### `-workpattern` — Work pattern analysis
 
@@ -234,45 +503,23 @@ Directories highlighted in yellow have a sole owner (≥90%) — a potential bus
   author               commits  weekend  after-hrs   peak  signals
   ─────────────────────────────────────────────────────────────────
   Alice Chen                87      8%        22%  10:00 Mon
-  Bob Smith                 41     41%        68%  23:00 Sat  ⚠ 41% weekend commits — possible burnout
+  Bob Smith                 41     41%        68%  23:00 Sat  ⚠ 41% weekend commits
 ```
 
-Work hours default to 09:00–18:00. Override with `-work-start` and `-work-end`.
+**Signals detected:**
 
----
+| Signal | Threshold |
+|--------|-----------|
+| Weekend commits | ≥30% of commits on Sat/Sun |
+| After-hours commits | ≥50% outside configured work hours |
+| Night owl | ≥25% of commits after 22:00 |
+| Early bird | ≥20% of commits before 07:00 |
 
-## Export examples
+Work hours default to 09:00–18:00. Adjust with `-work-start` and `-work-end`:
 
 ```bash
-# JSON for CI or dashboards
-git-summary --since "1 month ago" --format json --output report.json
-
-# Markdown report for stakeholders
-git-summary --since "1 month ago" --format md --output REPORT.md
-
-# CSV for spreadsheets
-git-summary --format csv --output data.csv
-
-# Pipe-friendly
-git-summary --format json | jq '.contributors[0]'
+git-summary --workpattern --work-start 8 --work-end 17
 ```
-
----
-
-## Shell completion
-
-```bash
-# bash — add to ~/.bashrc
-source <(git-summary completion bash)
-
-# zsh — add to ~/.zshrc
-source <(git-summary completion zsh)
-
-# fish — one-time install
-git-summary completion fish > ~/.config/fish/completions/git-summary.fish
-```
-
-After setup, `git-summary [TAB][TAB]` completes flags, subcommands, branch names, tag names, and date values.
 
 ---
 
@@ -281,55 +528,52 @@ After setup, `git-summary [TAB][TAB]` completes flags, subcommands, branch names
 ```
 git-summary/
 ├── main.go                          Entry point
-├── install.sh                       Build + install + completion setup
+├── go.mod                           Module definition (zero external deps)
+├── install.sh                       Build + install + completion setup (Linux/macOS)
+├── .github/
+│   └── workflows/
+│       ├── ci.yml                   Build check on every push
+│       └── release.yml              Cross-platform build on every tag push
 ├── cmd/
-│   └── root.go                      CLI flags, subcommand routing
+│   └── root.go                      CLI flags, subcommand routing, shell completion scripts
 └── internal/
     ├── gitlog/
-    │   └── parser.go                git log → []Commit
+    │   └── parser.go                Shells out to git log, parses into []Commit
     ├── stats/
-    │   └── compute.go               Core metrics (contributors, files, heatmap)
+    │   └── compute.go               Core metrics — contributors, files, heatmap, weekly chart
     ├── display/
-    │   └── render.go                Terminal rendering + ANSI colors
+    │   └── render.go                ANSI terminal rendering
     ├── export/
-    │   └── export.go                JSON / CSV / Markdown export
+    │   └── export.go                JSON / CSV / Markdown serialisation
     ├── compare/
-    │   └── compare.go               Branch-vs-branch comparison
+    │   └── compare.go               Branch-vs-branch diff logic and renderer
     ├── tagdiff/
-    │   └── tagdiff.go               Tag/ref changelog generator
+    │   └── tagdiff.go               Tag/ref range commit parser and changelog renderer
     ├── trend/
-    │   └── trend.go                 Contributor sparklines & bus factor
+    │   └── trend.go                 Per-author sparklines, trend detection, bus factor
     ├── dirmap/
-    │   └── dirmap.go                Directory ownership breakdown
+    │   └── dirmap.go                Directory-level file grouping and ownership percentages
     ├── workpattern/
-    │   └── workpattern.go           Work hour & burnout signal analysis
+    │   └── workpattern.go           Timestamp pattern analysis and burnout signal detection
     └── prompt/
-        └── picker.go                Interactive time-range picker
+        └── picker.go                Interactive time-range picker for terminal
 ```
-
-| Package | Responsibility |
-|---------|---------------|
-| `cmd` | Parses flags, routes to subcommands, wires everything |
-| `internal/gitlog` | Shells out to `git log --numstat`, parses into `[]Commit` |
-| `internal/stats` | Pure computation — no I/O, easily testable |
-| `internal/display` | ANSI terminal rendering |
-| `internal/export` | Serialises to JSON / CSV / Markdown |
-| `internal/compare` | Branch diff logic + renderer |
-| `internal/tagdiff` | Tag-range commit parsing + changelog renderer |
-| `internal/trend` | Time-series per author, bus factor detection |
-| `internal/dirmap` | File-path grouping, ownership percentages |
-| `internal/workpattern` | Timestamp pattern analysis, burnout signals |
-| `internal/prompt` | Interactive terminal picker (no external deps) |
 
 ---
 
 ## Contributing
 
-PRs welcome. Please open an issue first for large changes.
+PRs are welcome. Please open an issue first to discuss large changes.
 
 ```bash
-go test ./...
+# Build
 go build -ldflags="-s -w" -o git-summary .
+
+# Run tests
+go test ./...
+
+# Vet
+go vet ./...
 ```
 
 ## License
