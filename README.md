@@ -563,9 +563,15 @@ git-summary/
 
 ## Contributing
 
-PRs are welcome. Please open an issue first to discuss large changes.
+Contributions are very welcome — whether it's a bug fix, new feature, documentation improvement, or just a typo correction.
+
+**Before submitting a PR for a large change, please open an issue first** so we can discuss the approach. For small fixes, feel free to open a PR directly.
 
 ```bash
+# Clone the repo
+git clone https://github.com/mamatqurtifa/git-summary.git
+cd git-summary
+
 # Build
 go build -ldflags="-s -w" -o git-summary .
 
@@ -576,6 +582,31 @@ go test ./...
 go vet ./...
 ```
 
-## License
+### Ideas for contribution
 
-MIT
+If you're looking for something to work on, here are areas that would be great additions:
+
+- **Phase 3** — Full TUI interactive mode (`git-summary tui`) using [bubbletea](https://github.com/charmbracelet/bubbletea)
+- **Phase 3** — HTML report export (`--html report.html`) with interactive charts
+- **Phase 4** — `git-summary serve` — live dashboard in the browser
+- **Phase 4** — GitHub Action for automated weekly Slack/Discord reports
+- More export formats (e.g. XML, NDJSON)
+- Windows shell completion (PowerShell)
+- Tests for existing packages
+
+---
+
+## Reporting bugs & getting help
+
+Found a bug? Something not working as expected? Have a question?
+
+**→ [Open an issue on GitHub](https://github.com/mamatqurtifa/git-summary/issues/new)**
+
+When reporting a bug, please include:
+- Your OS and architecture (e.g. Windows amd64, macOS arm64)
+- The `git-summary version` output
+- The exact command you ran
+- The full error message or unexpected output
+
+You can also reach me directly at **[@mamatqurtifa](https://github.com/mamatqurtifa)** on GitHub.
+
